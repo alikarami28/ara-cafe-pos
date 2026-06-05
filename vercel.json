@@ -6,20 +6,14 @@
     "GITHUB_CLIENT_SECRET": "@github-client-secret",
     "SITE_URL": "https://ara-cafe-pos.vercel.app"
   },
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "**/*",
-      "use": "@vercel/static"
-    }
-  ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin/index.html"
     },
     {
       "src": "/(.*)",
@@ -37,19 +31,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, OPTIONS"
         }
       ]
     }
