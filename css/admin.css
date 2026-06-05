@@ -1,0 +1,129 @@
+/* ====================================
+   ARA Cafe - پنل مدیریت - استایل‌ها
+   ==================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: linear-gradient(135deg, #3E2723 0%, #5D4037 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.admin-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+.admin-header {
+    margin-bottom: 30px;
+}
+
+.admin-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #C8A97E;
+    margin-bottom: 20px;
+}
+
+.admin-header h1 {
+    color: #3E2723;
+    font-size: 2rem;
+}
+
+.admin-info h2 {
+    color: #5D4037;
+    margin-bottom: 15px;
+}
+
+.admin-info p {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+.instructions {
+    text-align: right;
+    background: #f9f5f0;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.instructions h3 {
+    color: #3E2723;
+    margin-bottom: 10px;
+}
+
+.instructions ol {
+    padding-right: 20px;
+}
+
+.instructions li {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 15px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #C8A97E;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #3E2723;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(200, 169, 126, 0.4);
+}
+
+.btn-secondary {
+    background: #f0e6d8;
+    color: #3E2723;
+}
+
+.btn-secondary:hover {
+    background: #D7CCC8;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 20px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
