@@ -1,8 +1,8 @@
 backend:
   name: github
-  repo: YOUR-USERNAME/ara-cafe-pos  # نام ریپوی GitHub
+  repo: alikarami28/ara-cafe-pos  # نام ریپوی GitHub
   branch: main
-  base_url: https://ara-cafe.vercel.app
+  base_url: https://ara-cafe-pos.vercel.app
   auth_endpoint: api/auth
 
 media_folder: "images/products"
