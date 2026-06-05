@@ -1,5 +1,6 @@
 // ====================================
-// ARA Cafe - سیستم POS اصلی
+// ARA Cafe - سیستم POS - نسخه Mobile-First
+// با آپدیت‌های ریسپانسیو
 // ====================================
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -17,12 +18,38 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // لود تاریخچه
     loadOrderHistory();
+    
+    // تشخیص دستگاه و تنظیمات خاص
+    setupDeviceSpecifics();
 });
 
 let posProducts = [];
 let posCategories = [];
 let cart = [];
 let currentInvoice = null;
+
+// تشخیص دستگاه
+function setupDeviceSpecifics() {
+    const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
+    
+    if (isMobile && !isTablet) {
+        // تنظیمات خاص موبایل
+        document.querySelector('.pos-products-grid').style.gridTemplateColumns = 'repeat(3, 1fr)';
+    }
+    
+    if (isTablet) {
+        // تنظیمات خاص تبلت
+        document.querySelector('.pos-products-grid').style.gridTemplateColumns = 'repeat(4, 1fr)';
+    }
+    
+    // غیرفعال کردن Drag & Drop در موبایل (بهتر برای UX)
+    if (isMobile) {
+        document.querySelectorAll('.cart-item').forEach(item => {
+            item.draggable = false;
+        });
+    }
+}
 
 // لود دیتای POS
 async function loadPOSData() {
@@ -43,11 +70,17 @@ async function loadPOSData() {
         posProducts = [
             { id: 1, name: 'لاته', price: 120000, category: 'hot' },
             { id: 2, name: 'کاپوچینو', price: 110000, category: 'hot' },
-            { id: 3, name: 'آیس لاته', price: 130000, category: 'cold' }
+            { id: 3, name: 'آمریکانو', price: 90000, category: 'hot' },
+            { id: 4, name: 'آیس لاته', price: 130000, category: 'cold' },
+            { id: 5, name: 'فراپه', price: 140000, category: 'cold' },
+            { id: 6, name: 'چای ماسالا', price: 100000, category: 'tea' },
+            { id: 7, name: 'چیزکیک', price: 150000, category: 'dessert' }
         ];
         posCategories = [
             { id: 'hot', name: 'گرم', icon: '☕' },
-            { id: 'cold', name: 'سرد', icon: '🧊' }
+            { id: 'cold', name: 'سرد', icon: '🧊' },
+            { id: 'tea', name: 'چای', icon: '🫖' },
+            { id: 'dessert', name: 'دسر', icon: '🍰' }
         ];
         
         renderPOSCategories();
@@ -70,7 +103,7 @@ function renderPOSCategories() {
     posCategories.forEach(category => {
         const btn = document.createElement('button');
         btn.className = 'pos-category-btn';
-        btn.textContent = `${category.icon} ${category.name}`;
+        btn.textContent = `${category.icon || ''} ${category.name}`;
         btn.addEventListener('click', () => filterPOSByCategory(category.id));
         container.appendChild(btn);
     });
@@ -81,6 +114,11 @@ function renderPOSProducts(products) {
     const grid = document.getElementById('posProductsGrid');
     grid.innerHTML = '';
     
+    if (products.length === 0) {
+        grid.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.5; grid-column: 1 / -1;">محصولی یافت نشد</div>';
+        return;
+    }
+    
     products.forEach(product => {
         const card = document.createElement('div');
         card.className = 'pos-product-card';
@@ -88,13 +126,39 @@ function renderPOSProducts(products) {
             <div class="pos-product-name">${product.name}</div>
             <div class="pos-product-price">${ARAUtils.formatCurrency(product.price)}</div>
         `;
-        card.addEventListener('click', () => addToCart(product));
+        
+        // تاچ و کلیک
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            addToCart(product);
+            
+            // بازخورد لمسی
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                card.style.transform = '';
+            }, 150);
+        });
+        
+        // لانگ پرس برای جزئیات
+        let longPressTimer;
+        card.addEventListener('touchstart', () => {
+            longPressTimer = setTimeout(() => {
+                // می‌تونیم جزئیات محصول رو نشون بدیم
+                console.log('Long press:', product.name);
+            }, 500);
+        });
+        
+        card.addEventListener('touchend', () => {
+            clearTimeout(longPressTimer);
+        });
+        
         grid.appendChild(card);
     });
 }
 
 // فیلتر محصولات POS
 function filterPOSByCategory(categoryId) {
+    // آپدیت دکمه‌های فعال
     document.querySelectorAll('.pos-category-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -102,17 +166,28 @@ function filterPOSByCategory(categoryId) {
     if (categoryId === 'all') {
         document.querySelectorAll('.pos-category-btn')[0].classList.add('active');
         renderPOSProducts(posProducts);
-    } else {
-        const buttons = document.querySelectorAll('.pos-category-btn');
-        buttons.forEach(btn => {
-            if (btn.textContent.includes(getCategoryName(categoryId))) {
-                btn.classList.add('active');
-            }
-        });
-        
-        const filtered = posProducts.filter(p => p.category === categoryId);
-        renderPOSProducts(filtered);
+        return;
     }
+    
+    // پیدا کردن دکمه مرتبط
+    const buttons = document.querySelectorAll('.pos-category-btn');
+    let found = false;
+    buttons.forEach(btn => {
+        const category = posCategories.find(c => 
+            btn.textContent.includes(c.name) && c.id === categoryId
+        );
+        if (category) {
+            btn.classList.add('active');
+            found = true;
+        }
+    });
+    
+    if (!found && buttons.length > 0) {
+        buttons[0].classList.add('active');
+    }
+    
+    const filtered = posProducts.filter(p => p.category === categoryId);
+    renderPOSProducts(filtered);
 }
 
 // جستجوی POS
@@ -128,11 +203,15 @@ function setupPOSSearch() {
         }
         
         const filtered = posProducts.filter(product => 
-            product.name.toLowerCase().includes(query)
+            product.name.toLowerCase().includes(query) ||
+            (product.description && product.description.toLowerCase().includes(query))
         );
         
         renderPOSProducts(filtered);
     }, 300));
+    
+    // فوکوس خودکار روی جستجو
+    searchInput.focus();
 }
 
 // افزودن به سبد خرید
@@ -152,6 +231,17 @@ function addToCart(product) {
     
     renderCart();
     updateCalculations();
+    
+    // اسکرول به پایین سبد خرید در موبایل
+    if (window.innerWidth < 768) {
+        const cartItems = document.getElementById('cartItems');
+        cartItems.scrollTop = cartItems.scrollHeight;
+    }
+    
+    // بازخورد صوتی (اختیاری)
+    if ('vibrate' in navigator) {
+        navigator.vibrate(30);
+    }
 }
 
 // افزایش تعداد
@@ -161,6 +251,9 @@ function increaseQty(productId) {
         item.qty++;
         renderCart();
         updateCalculations();
+        if ('vibrate' in navigator) {
+            navigator.vibrate(15);
+        }
     }
 }
 
@@ -171,10 +264,17 @@ function decreaseQty(productId) {
         if (item.qty > 1) {
             item.qty--;
         } else {
-            cart = cart.filter(item => item.id !== productId);
+            if (confirm('حذف این آیتم از سبد خرید؟')) {
+                cart = cart.filter(item => item.id !== productId);
+            } else {
+                return;
+            }
         }
         renderCart();
         updateCalculations();
+        if ('vibrate' in navigator) {
+            navigator.vibrate(15);
+        }
     }
 }
 
@@ -183,6 +283,9 @@ function removeFromCart(productId) {
     cart = cart.filter(item => item.id !== productId);
     renderCart();
     updateCalculations();
+    if ('vibrate' in navigator) {
+        navigator.vibrate([20, 50, 20]);
+    }
 }
 
 // رندر سبد خرید
@@ -190,7 +293,7 @@ function renderCart() {
     const container = document.getElementById('cartItems');
     
     if (cart.length === 0) {
-        container.innerHTML = '<div class="empty-cart"><p>سبد خرید خالی است</p></div>';
+        container.innerHTML = '<div class="empty-cart"><p>🛒 سبد خرید خالی است</p><p style="font-size: 0.8rem; opacity: 0.6;">برای افزودن محصول کلیک کنید</p></div>';
         return;
     }
     
@@ -201,18 +304,25 @@ function renderCart() {
         
         const cartItem = document.createElement('div');
         cartItem.className = 'cart-item';
-        cartItem.draggable = true;
+        
+        // فقط در دسکتاپ Drag فعال است
+        if (window.innerWidth >= 1024) {
+            cartItem.draggable = true;
+        }
         
         cartItem.innerHTML = `
             <div class="item-info">
                 <div class="item-name">${item.name}</div>
-                <div class="item-price">${ARAUtils.formatCurrency(item.price)} × ${item.qty} = ${ARAUtils.formatCurrency(totalPrice)}</div>
+                <div class="item-price">
+                    ${ARAUtils.formatCurrency(item.price)} × ${item.qty} = 
+                    <strong>${ARAUtils.formatCurrency(totalPrice)}</strong>
+                </div>
             </div>
             <div class="item-controls">
-                <button class="qty-btn" onclick="decreaseQty(${item.id})">-</button>
+                <button class="qty-btn" onclick="decreaseQty(${item.id})" aria-label="کاهش">−</button>
                 <span class="item-qty">${item.qty}</span>
-                <button class="qty-btn" onclick="increaseQty(${item.id})">+</button>
-                <button class="delete-item" onclick="removeFromCart(${item.id})">🗑️</button>
+                <button class="qty-btn" onclick="increaseQty(${item.id})" aria-label="افزایش">+</button>
+                <button class="delete-item" onclick="removeFromCart(${item.id})" aria-label="حذف">🗑</button>
             </div>
         `;
         
@@ -234,7 +344,7 @@ function updateCalculations() {
         discount = discountAmount;
     }
     
-    const tax = subtotal * 0.09; // ۹٪ مالیات
+    const tax = subtotal * 0.09;
     const total = subtotal - discount + tax;
     
     document.getElementById('subtotal').textContent = ARAUtils.formatCurrency(subtotal);
@@ -249,22 +359,31 @@ function updateCalculations() {
 function setupPOSEvents() {
     // پاک کردن سبد خرید
     document.getElementById('clearCartBtn').addEventListener('click', () => {
-        if (confirm('آیا از حذف تمام آیتم‌ها اطمینان دارید؟')) {
+        if (cart.length === 0) return;
+        
+        if (confirm('آیا از حذف تمام آیتم‌های سبد خرید اطمینان دارید؟')) {
             cart = [];
             renderCart();
             updateCalculations();
+            if ('vibrate' in navigator) {
+                navigator.vibrate([50, 100, 50]);
+            }
         }
     });
     
     // تغییر تخفیف
-    document.getElementById('discountPercent').addEventListener('input', updateCalculations);
-    document.getElementById('discountAmount').addEventListener('input', function() {
-        document.getElementById('discountPercent').value = '';
+    document.getElementById('discountPercent').addEventListener('input', function() {
+        if (this.value) {
+            document.getElementById('discountAmount').value = '';
+        }
         updateCalculations();
     });
     
-    document.getElementById('discountPercent').addEventListener('input', function() {
-        document.getElementById('discountAmount').value = '';
+    document.getElementById('discountAmount').addEventListener('input', function() {
+        if (this.value) {
+            document.getElementById('discountPercent').value = '';
+        }
+        updateCalculations();
     });
     
     // صدور فاکتور
@@ -292,12 +411,35 @@ function setupPOSEvents() {
         }
     });
     
-    // کیبورد شورتکات
-    document.addEventListener('keydown', handleKeyboardShortcuts);
+    // Swipe در مودال برای بستن
+    let touchStartY = 0;
+    document.querySelector('.modal-content').addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    });
+    
+    document.querySelector('.modal-content').addEventListener('touchmove', (e) => {
+        const touchEndY = e.touches[0].clientY;
+        if (touchEndY - touchStartY > 100) {
+            document.getElementById('invoiceModal').classList.remove('active');
+        }
+    });
+    
+    // کیبورد شورتکات (فقط دسکتاپ)
+    if (window.innerWidth >= 1024) {
+        document.addEventListener('keydown', handleKeyboardShortcuts);
+    }
+    
+    // رفرش ریسپانسیو
+    window.addEventListener('resize', ARAUtils.debounce(() => {
+        renderCart(); // بروزرسانی Drag & Drop
+    }, 250));
 }
 
 // کیبورد شورتکات‌ها
 function handleKeyboardShortcuts(e) {
+    // جلوگیری از اجرا در input‌ها
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
     // Ctrl + Enter = صدور فاکتور
     if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
@@ -313,7 +455,7 @@ function handleKeyboardShortcuts(e) {
     }
     
     // Esc = پاک کردن سبد
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' && cart.length > 0) {
         if (confirm('پاک کردن سبد خرید؟')) {
             cart = [];
             renderCart();
@@ -326,12 +468,34 @@ function handleKeyboardShortcuts(e) {
         e.preventDefault();
         document.getElementById('posSearchInput').focus();
     }
+    
+    // F2 = فوکوس روی تخفیف درصدی
+    if (e.key === 'F2') {
+        e.preventDefault();
+        document.getElementById('discountPercent').focus();
+    }
+    
+    // +/- برای آخرین آیتم
+    if (e.key === '+' && e.ctrlKey && cart.length > 0) {
+        e.preventDefault();
+        const lastItem = cart[cart.length - 1];
+        increaseQty(lastItem.id);
+    }
+    
+    if (e.key === '-' && e.ctrlKey && cart.length > 0) {
+        e.preventDefault();
+        const lastItem = cart[cart.length - 1];
+        decreaseQty(lastItem.id);
+    }
 }
 
 // صدور فاکتور
 function generateInvoice() {
     if (cart.length === 0) {
-        alert('سبد خرید خالی است!');
+        alert('⚠️ سبد خرید خالی است!');
+        if ('vibrate' in navigator) {
+            navigator.vibrate([100, 50, 100]);
+        }
         return;
     }
     
@@ -362,7 +526,15 @@ function generateInvoice() {
     // رفرش تاریخچه
     loadOrderHistory();
     
-    alert(`فاکتور شماره ${currentInvoice.invoiceNo} با موفقیت صادر شد.`);
+    // بازخورد موفقیت
+    if ('vibrate' in navigator) {
+        navigator.vibrate([50, 30, 50, 30, 100]);
+    }
+    
+    // نمایش alert با تاخیر (بعد از مودال)
+    setTimeout(() => {
+        alert(`✅ فاکتور شماره ${currentInvoice.invoiceNo} با موفقیت صادر شد.`);
+    }, 300);
 }
 
 // نمایش فاکتور در مودال
@@ -371,22 +543,50 @@ function showInvoiceModal(invoice) {
     const details = document.getElementById('invoiceDetails');
     
     details.innerHTML = `
-        <h2>🧾 فاکتور فروش</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="logo.png" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%; margin-bottom: 10px;">
+            <h2>🧾 فاکتور فروش</h2>
+            <p style="color: var(--color-accent);">ARA Cafe</p>
+        </div>
         <hr>
-        <p><strong>شماره فاکتور:</strong> ${invoice.invoiceNo}</p>
-        <p><strong>تاریخ:</strong> ${ARAUtils.formatDate(invoice.date)}</p>
+        <div style="margin: 15px 0;">
+            <p><strong>شماره فاکتور:</strong> ${invoice.invoiceNo}</p>
+            <p><strong>تاریخ:</strong> ${ARAUtils.formatDate(invoice.date)}</p>
+        </div>
         <hr>
-        <h3>اقلام:</h3>
-        <ul>
+        <h3 style="margin: 10px 0;">📋 اقلام:</h3>
+        <div style="margin: 10px 0;">
             ${invoice.items.map(item => `
-                <li>${item.name} - ${item.qty} عدد × ${ARAUtils.formatCurrency(item.price)} = ${ARAUtils.formatCurrency(item.qty * item.price)}</li>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <span>${item.name} × ${item.qty}</span>
+                    <span>${ARAUtils.formatCurrency(item.qty * item.price)}</span>
+                </div>
             `).join('')}
-        </ul>
+        </div>
         <hr>
-        <p><strong>جمع کل:</strong> ${ARAUtils.formatCurrency(invoice.subtotal)}</p>
-        <p><strong>تخفیف:</strong> ${ARAUtils.formatCurrency(invoice.discount)}</p>
-        <p><strong>مالیات:</strong> ${ARAUtils.formatCurrency(invoice.tax)}</p>
-        <p style="font-size: 1.3rem; color: #C8A97E;"><strong>مبلغ نهایی:</strong> ${ARAUtils.formatCurrency(invoice.total)}</p>
+        <div style="margin: 10px 0;">
+            <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                <span>جمع کل:</span>
+                <span>${ARAUtils.formatCurrency(invoice.subtotal)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                <span>تخفیف:</span>
+                <span style="color: var(--color-danger);">${ARAUtils.formatCurrency(invoice.discount)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                <span>مالیات (۹٪):</span>
+                <span>${ARAUtils.formatCurrency(invoice.tax)}</span>
+            </div>
+        </div>
+        <hr>
+        <div style="display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; color: var(--color-accent); margin: 15px 0;">
+            <span>💰 مبلغ نهایی:</span>
+            <span>${ARAUtils.formatCurrency(invoice.total)}</span>
+        </div>
+        <div style="text-align: center; margin-top: 20px; opacity: 0.7; font-size: 0.85rem;">
+            <p>با تشکر از خرید شما 🌹</p>
+            <p>ARA Cafe - 021-12345678</p>
+        </div>
     `;
     
     modal.classList.add('active');
@@ -395,49 +595,50 @@ function showInvoiceModal(invoice) {
 // چاپ فاکتور
 function printInvoice() {
     if (!currentInvoice) {
-        alert('ابتدا یک فاکتور صادر کنید.');
+        alert('⚠️ ابتدا یک فاکتور صادر کنید.');
         return;
     }
     
     const printTemplate = document.getElementById('printTemplate');
     
     printTemplate.innerHTML = `
-        <div style="text-align: center; padding: 20px; font-family: 'Vazirmatn'; width: 80mm;">
-            <img src="logo.png" alt="Logo" style="width: 60px; height: 60px; margin-bottom: 10px;">
-            <h2 style="margin: 5px 0;">ARA Cafe</h2>
-            <p style="margin: 5px 0;">قهوه اصیل، طعم بی‌نظیر</p>
-            <hr>
-            <p><strong>فاکتور شماره:</strong> ${currentInvoice.invoiceNo}</p>
-            <p><strong>تاریخ:</strong> ${ARAUtils.formatDate(currentInvoice.date)}</p>
-            <hr>
-            <table style="width: 100%; text-align: right;">
+        <div style="text-align: center; padding: 15px; font-family: 'Vazirmatn', sans-serif; width: 80mm; font-size: 12px;">
+            <img src="logo.png" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%; margin-bottom: 8px;">
+            <h2 style="margin: 3px 0; font-size: 16px;">☕ ARA Cafe</h2>
+            <p style="margin: 3px 0; font-size: 11px;">قهوه اصیل، طعم بی‌نظیر</p>
+            <hr style="border: 1px dashed #000; margin: 8px 0;">
+            <p style="margin: 3px 0;"><strong>فاکتور شماره:</strong> ${currentInvoice.invoiceNo}</p>
+            <p style="margin: 3px 0;"><strong>تاریخ:</strong> ${ARAUtils.formatDate(currentInvoice.date)}</p>
+            <hr style="border: 1px dashed #000; margin: 8px 0;">
+            <table style="width: 100%; text-align: right; font-size: 11px; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th>نام</th>
-                        <th>تعداد</th>
-                        <th>قیمت</th>
-                        <th>جمع</th>
+                    <tr style="border-bottom: 1px solid #000;">
+                        <th style="padding: 3px;">نام</th>
+                        <th style="padding: 3px;">تعداد</th>
+                        <th style="padding: 3px;">قیمت</th>
+                        <th style="padding: 3px;">جمع</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${currentInvoice.items.map(item => `
                         <tr>
-                            <td>${item.name}</td>
-                            <td>${item.qty}</td>
-                            <td>${item.price}</td>
-                            <td>${item.qty * item.price}</td>
+                            <td style="padding: 3px;">${item.name}</td>
+                            <td style="padding: 3px; text-align: center;">${item.qty}</td>
+                            <td style="padding: 3px;">${ARAUtils.formatCurrency(item.price)}</td>
+                            <td style="padding: 3px;">${ARAUtils.formatCurrency(item.qty * item.price)}</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-            <hr>
-            <p><strong>جمع کل:</strong> ${ARAUtils.formatCurrency(currentInvoice.subtotal)}</p>
-            <p><strong>تخفیف:</strong> ${ARAUtils.formatCurrency(currentInvoice.discount)}</p>
-            <p><strong>مالیات:</strong> ${ARAUtils.formatCurrency(currentInvoice.tax)}</p>
-            <h3>مبلغ نهایی: ${ARAUtils.formatCurrency(currentInvoice.total)}</h3>
-            <hr>
-            <p>با تشکر از خرید شما</p>
-            <p>ARA Cafe - 021-12345678</p>
+            <hr style="border: 1px dashed #000; margin: 8px 0;">
+            <p style="margin: 3px 0; display: flex; justify-content: space-between;"><span>جمع کل:</span> <span>${ARAUtils.formatCurrency(currentInvoice.subtotal)}</span></p>
+            <p style="margin: 3px 0; display: flex; justify-content: space-between;"><span>تخفیف:</span> <span>${ARAUtils.formatCurrency(currentInvoice.discount)}</span></p>
+            <p style="margin: 3px 0; display: flex; justify-content: space-between;"><span>مالیات:</span> <span>${ARAUtils.formatCurrency(currentInvoice.tax)}</span></p>
+            <h3 style="margin: 8px 0; font-size: 15px;">💰 مبلغ نهایی: ${ARAUtils.formatCurrency(currentInvoice.total)}</h3>
+            <hr style="border: 1px dashed #000; margin: 8px 0;">
+            <p style="margin: 3px 0; font-size: 11px;">با تشکر از خرید شما 🌹</p>
+            <p style="margin: 3px 0; font-size: 10px;">ARA Cafe - 021-12345678</p>
+            <p style="margin: 3px 0; font-size: 10px;">@ara_cafe</p>
         </div>
     `;
     
@@ -447,24 +648,37 @@ function printInvoice() {
 // لود تاریخچه فاکتورها
 function loadOrderHistory(dateFilter = null) {
     const container = document.getElementById('historyList');
-    const orders = window.orderManager.getOrderHistory(dateFilter);
     
-    if (orders.length === 0) {
-        container.innerHTML = '<p style="opacity: 0.5;">موردی یافت نشد</p>';
+    if (!window.orderManager) {
+        container.innerHTML = '<p style="opacity: 0.5; font-size: 0.8rem;">در حال بارگذاری...</p>';
         return;
     }
     
-    container.innerHTML = orders.map(order => `
+    const orders = window.orderManager.getOrderHistory(dateFilter);
+    
+    if (orders.length === 0) {
+        container.innerHTML = '<p style="opacity: 0.5; font-size: 0.8rem;">📭 موردی یافت نشد</p>';
+        return;
+    }
+    
+    container.innerHTML = orders.slice(0, 20).map(order => `
         <div class="history-item" onclick="showInvoiceDetails(${order.invoiceNo})">
-            <strong>#${order.invoiceNo}</strong> - 
-            ${ARAUtils.formatDate(order.date)} - 
-            ${ARAUtils.formatCurrency(order.total)}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>#${order.invoiceNo}</strong>
+                <span style="font-size: 0.75rem; opacity: 0.7;">${ARAUtils.formatDate(order.date)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 3px;">
+                <span>${order.items.length} آیتم</span>
+                <span style="color: var(--color-accent); font-weight: 700;">${ARAUtils.formatCurrency(order.total)}</span>
+            </div>
         </div>
     `).join('');
 }
 
 // نمایش جزئیات فاکتور از تاریخچه
 function showInvoiceDetails(invoiceNo) {
+    if (!window.orderManager) return;
+    
     const invoice = window.orderManager.getOrderByInvoiceNo(invoiceNo);
     if (invoice) {
         currentInvoice = invoice;
