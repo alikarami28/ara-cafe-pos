@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARA Cafe - پنل مدیریت</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <img src="../logo.png" alt="ARA Cafe" class="admin-logo">
+            <h1>پنل مدیریت ARA Cafe</h1>
+        </div>
+        
+        <div class="admin-info">
+            <h2>🔐 مدیریت محتوا با Decap CMS</h2>
+            <p>از این پنل برای مدیریت منو و محصولات کافه استفاده کنید.</p>
+            
+            <div class="instructions">
+                <h3>راهنما:</h3>
+                <ol>
+                    <li>وارد حساب GitHub خود شوید</li>
+                    <li>محصولات را اضافه، ویرایش یا حذف کنید</li>
+                    <li>تغییرات به صورت خودکار در GitHub ذخیره می‌شود</li>
+                    <li>Vercel پس از هر تغییر، سایت را دوباره Deploy می‌کند</li>
+                </ol>
+            </div>
 
+            <div class="action-buttons">
+                <a href="https://ara-cafe.vercel.app/admin/index.html" class="btn-primary">
+                    📝 ورود به Decap CMS
+                </a>
+                <a href="../index.html" class="btn-secondary">
+                    📱 مشاهده منوی عمومی
+                </a>
+                <a href="../pos.html" class="btn-secondary">
+                    💰 ورود به POS
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decap CMS Script -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+</body>
+</html>
