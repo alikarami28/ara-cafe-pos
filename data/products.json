@@ -1,0 +1,116 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "لاته",
+      "description": "اسپرسو + شیر بخارپز شده",
+      "price": 120000,
+      "category": "hot",
+      "image": "images/products/latte.jpg",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": 2,
+      "name": "کاپوچینو",
+      "description": "اسپرسو + شیر کف‌دار",
+      "price": 110000,
+      "category": "hot",
+      "image": "images/products/cappuccino.jpg",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": 3,
+      "name": "آمریکانو",
+      "description": "اسپرسو + آب داغ",
+      "price": 90000,
+      "category": "hot",
+      "image": "images/products/americano.jpg",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": 4,
+      "name": "آیس لاته",
+      "description": "اسپرسو + شیر سرد + یخ",
+      "price": 130000,
+      "category": "cold",
+      "image": "images/products/iced-latte.jpg",
+      "active": true,
+      "sortOrder": 4
+    },
+    {
+      "id": 5,
+      "name": "فراپه",
+      "description": "قهوه فوری + یخ + شیر",
+      "price": 140000,
+      "category": "cold",
+      "image": "images/products/frappe.jpg",
+      "active": true,
+      "sortOrder": 5
+    },
+    {
+      "id": 6,
+      "name": "چای ماسالا",
+      "description": "چای سیاه + ادویه هندی + شیر",
+      "price": 100000,
+      "category": "tea",
+      "image": "images/products/masala-tea.jpg",
+      "active": true,
+      "sortOrder": 6
+    },
+    {
+      "id": 7,
+      "name": "دمنوش بابونه",
+      "description": "دمنوش گیاهی آرامش‌بخش",
+      "price": 80000,
+      "category": "tea",
+      "image": "images/products/chamomile.jpg",
+      "active": true,
+      "sortOrder": 7
+    },
+    {
+      "id": 8,
+      "name": "چیزکیک نیویورکی",
+      "description": "چیزکیک کلاسیک آمریکایی",
+      "price": 150000,
+      "category": "dessert",
+      "image": "images/products/cheesecake.jpg",
+      "active": true,
+      "sortOrder": 8
+    },
+    {
+      "id": 9,
+      "name": "شکلات براونی",
+      "description": "براونی شکلاتی گرم",
+      "price": 120000,
+      "category": "dessert",
+      "image": "images/products/brownie.jpg",
+      "active": true,
+      "sortOrder": 9
+    }
+  ],
+  "categories": [
+    {
+      "id": "hot",
+      "name": "نوشیدنی‌های گرم",
+      "icon": "☕"
+    },
+    {
+      "id": "cold",
+      "name": "نوشیدنی‌های سرد",
+      "icon": "🧊"
+    },
+    {
+      "id": "tea",
+      "name": "چای و دمنوش",
+      "icon": "🫖"
+    },
+    {
+      "id": "dessert",
+      "name": "کیک و دسر",
+      "icon": "🍰"
+    }
+  ]
+}
