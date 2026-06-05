@@ -1,25 +1,69 @@
 backend:
   name: github
-  repo: YOUR-USERNAME/ara-cafe-pos
+  repo: alikarami28/ara-cafe-pos
   branch: main
+  base_url: https://ara-cafe-pos.vercel.app
+  auth_endpoint: api/auth
+  api_root: https://api.github.com
+  site_domain: ara-cafe-pos.vercel.app
 
 media_folder: "images/products"
 public_folder: "/images/products"
 
 collections:
   - name: "products"
-    label: "محصولات کافه"
+    label: "محصولات"
     folder: "data"
     create: true
+    format: "json"
+    extension: "json"
+    
     fields:
-      - { label: "شناسه", name: "id", widget: "number" }
-      - { label: "نام محصول", name: "name", widget: "string" }
-      - { label: "توضیحات", name: "description", widget: "text" }
-      - { label: "قیمت (ریال)", name: "price", widget: "number" }
+      - label: "شناسه"
+        name: "id"
+        widget: "number"
+        required: true
+      
+      - label: "نام محصول"
+        name: "name"
+        widget: "string"
+        required: true
+      
+      - label: "توضیحات"
+        name: "description"
+        widget: "text"
+        required: false
+      
+      - label: "قیمت (ریال)"
+        name: "price"
+        widget: "number"
+        required: true
+      
       - label: "دسته‌بندی"
         name: "category"
         widget: "select"
-        options: ["hot", "cold", "tea", "dessert"]
-      - { label: "تصویر", name: "image", widget: "image", required: false }
-      - { label: "فعال", name: "active", widget: "boolean", default: true }
-      - { label: "ترتیب نمایش", name: "sortOrder", widget: "number" }
+        required: true
+        options:
+          - label: "نوشیدنی گرم"
+            value: "hot"
+          - label: "نوشیدنی سرد"
+            value: "cold"
+          - label: "چای و دمنوش"
+            value: "tea"
+          - label: "کیک و دسر"
+            value: "dessert"
+      
+      - label: "تصویر"
+        name: "image"
+        widget: "image"
+        required: false
+      
+      - label: "فعال"
+        name: "active"
+        widget: "boolean"
+        default: true
+      
+      - label: "ترتیب نمایش"
+        name: "sortOrder"
+        widget: "number"
+        required: true
