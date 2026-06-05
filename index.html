@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARA Cafe - منوی آنلاین</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-mode">
+    <!-- دکمه تغییر تم -->
+    <button id="themeToggle" class="theme-toggle" aria-label="تغییر تم">
+        <span class="light-icon">☀️</span>
+        <span class="dark-icon">🌙</span>
+    </button>
+
+    <!-- هدر -->
+    <header class="hero">
+        <div class="hero-content">
+            <img src="logo.png" alt="ARA Cafe Logo" class="logo">
+            <h1>ARA Cafe</h1>
+            <p class="tagline">طعم واقعی قهوه را با ما تجربه کنید</p>
+            <div class="hero-banner">
+                <img src="banner.jpg" alt="ARA Cafe Banner" class="banner">
+            </div>
+        </div>
+    </header>
+
+    <!-- بخش جستجو -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="جستجوی محصول..."
+                autocomplete="off"
+            >
+        </div>
+    </div>
+
+    <!-- بخش دسته‌بندی‌ها -->
+    <nav class="categories-nav">
+        <div class="categories-container" id="categoriesContainer">
+            <!-- داینامیک از JSON -->
+        </div>
+    </nav>
+
+    <!-- بخش محصولات -->
+    <main class="menu-container">
+        <div class="products-grid" id="productsGrid">
+            <!-- داینامیک از JSON -->
+        </div>
+        <div class="no-results" id="noResults" style="display: none;">
+            <p>محصولی یافت نشد</p>
+        </div>
+    </main>
+
+    <!-- فوتر -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>🏠 آدرس: تهران، خیابان ولیعصر</p>
+            <p>📞 تلفن: 021-12345678</p>
+            <p>🕒 ساعات کاری: ۸ صبح تا ۱۱ شب</p>
+            <p class="copyright">© 2026 ARA Cafe. تمامی حقوق محفوظ است.</p>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/menu.js"></script>
+</body>
+</html>

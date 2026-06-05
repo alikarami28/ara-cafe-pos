@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARA Cafe - سیستم POS</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/pos.css">
+</head>
+<body class="dark-mode">
+    <div class="pos-layout">
+        <!-- پنل سمت راست: لیست محصولات -->
+        <aside class="products-panel">
+            <div class="panel-header">
+                <h2>☕ ARA Cafe POS</h2>
+                <div class="theme-toggle-container">
+                    <button id="themeToggle" class="theme-toggle-pos" aria-label="تغییر تم">
+                        <span>🌓</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- جستجو در POS -->
+            <div class="pos-search">
+                <input 
+                    type="text" 
+                    id="posSearchInput" 
+                    placeholder="جستجوی سریع..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <!-- تب‌های دسته‌بندی -->
+            <div class="pos-categories" id="posCategories">
+                <!-- داینامیک -->
+            </div>
+
+            <!-- شبکه محصولات -->
+            <div class="pos-products-grid" id="posProductsGrid">
+                <!-- داینامیک -->
+            </div>
+        </aside>
+
+        <!-- پنل سمت چپ: سبد خرید -->
+        <main class="cart-panel">
+            <div class="cart-header">
+                <h3>🛒 سبد خرید</h3>
+                <button class="clear-cart-btn" id="clearCartBtn">حذف همه</button>
+            </div>
+
+            <!-- آیتم‌های سبد خرید -->
+            <div class="cart-items" id="cartItems">
+                <div class="empty-cart">
+                    <p>سبد خرید خالی است</p>
+                </div>
+            </div>
+
+            <!-- محاسبات -->
+            <div class="cart-calculations">
+                <div class="calc-row">
+                    <span>جمع کل:</span>
+                    <span id="subtotal">۰ ریال</span>
+                </div>
+                <div class="calc-row">
+                    <span>تخفیف:</span>
+                    <div class="discount-inputs">
+                        <input 
+                            type="number" 
+                            id="discountPercent" 
+                            placeholder="%"
+                            min="0"
+                            max="100"
+                        >
+                        <span>یا</span>
+                        <input 
+                            type="number" 
+                            id="discountAmount" 
+                            placeholder="مبلغ"
+                            min="0"
+                        >
+                    </div>
+                </div>
+                <div class="calc-row">
+                    <span>مالیات (%۹):</span>
+                    <span id="tax">۰ ریال</span>
+                </div>
+                <div class="calc-row total-row">
+                    <span>مبلغ نهایی:</span>
+                    <span id="total">۰ ریال</span>
+                </div>
+            </div>
+
+            <!-- دکمه‌های عملیات -->
+            <div class="cart-actions">
+                <button class="btn-invoice" id="generateInvoiceBtn">
+                    📄 صدور فاکتور
+                </button>
+                <button class="btn-print" id="printInvoiceBtn" disabled>
+                    🖨️ چاپ فاکتور
+                </button>
+            </div>
+
+            <!-- تاریخچه فاکتورها -->
+            <div class="invoice-history">
+                <h3>📋 تاریخچه فاکتورها</h3>
+                <div class="history-search">
+                    <input 
+                        type="date" 
+                        id="historyDateSearch"
+                    >
+                    <button id="searchHistoryBtn">جستجو</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- داینامیک -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- مودال جزئیات فاکتور -->
+    <div class="modal" id="invoiceModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="invoiceDetails">
+                <!-- محتوای فاکتور -->
+            </div>
+        </div>
+    </div>
+
+    <!-- قالب چاپ فاکتور -->
+    <div class="print-template" id="printTemplate" style="display: none;">
+        <!-- پرینت فاکتور -->
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/pos.js"></script>
+</body>
+</html>
